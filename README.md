@@ -26,9 +26,8 @@ A RESTful Web API built using ASP.NET Core Web API and Entity Framework Core to 
 ## 📂 Project Structure
 - NZWalks.API
 - Controllers
-- Models (Domain)
-- DTOs
 - Data (DbContext)
+- Models (Domain, DTOs)
 - Program.cs
 
 ---
