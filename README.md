@@ -31,3 +31,7 @@ A RESTful Web API built using ASP.NET Core Web API and Entity Framework Core to 
 - Program.cs
 
 ---
+## 👤 Author
+Akshay Daundkar  
+.NET Backend Developer  
+GitHub: https://github.com/AkshayDaundkar23
