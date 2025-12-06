@@ -18,12 +18,37 @@ namespace NZWalks.API.Repositories
             return walk;
         }
 
-        public async Task<List<Walk>> GetAllWalkAsync()
+        public async Task<List<Walk>> GetAllWalkAsync(string? filterOn = null, string? filterQuery = null)
         {
-            return await _dbContext.Walks
-                .Include("Difficulty")
-                .Include("Region")
-                .ToListAsync();
+            //return await _dbContext.Walks
+            //    .Include("Difficulty")
+            //    .Include("Region")
+            //    .ToListAsync();
+
+
+            // Build the base query from Walks table
+            // Include Difficulty and Region to load related data (Eager Loading)
+            // AsQueryable() allows us to add conditions dynamically
+
+            var walks = _dbContext.Walks.Include("Difficulty").Include("Region").AsQueryable();
+
+            // Apply Filtering (if parameters are provided)
+
+            if (string.IsNullOrWhiteSpace(filterOn) == false && string.IsNullOrWhiteSpace(filterQuery) == false)
+            {
+                if (filterOn.Equals("Name", StringComparison.OrdinalIgnoreCase))        // If filtering is requested on the "Name" column
+                {
+                    // Apply partial string search using Contains()
+                    // This will translate to SQL LIKE '%value%'
+
+                    walks = walks.Where(x => x.Name.Contains(filterQuery));
+                }
+            }
+
+            // Execute the query and return result
+            // ToListAsync() executes the SQL query asynchronously
+
+            return await walks.ToListAsync();
         }
 
         public async Task<Walk?> GetWalkByIdAsync(Guid id)
