@@ -60,19 +60,26 @@ namespace NZWalks.API.Controllers
         public async Task<IActionResult> CreateRegion([FromBody] AddRegionRequestDTO addRegionRequestDTO)
         {
             // Map Dto to domain model
+            if (ModelState.IsValid)
+            {
+                var regionDomainModel = _mapper.Map<Region>(addRegionRequestDTO);
 
-            var regionDomainModel = _mapper.Map<Region>(addRegionRequestDTO);
+                // Use domain model to create Region in db
 
-            // Use domain model to create Region in db
+                await _regionRepository.CreateRegionAsync(regionDomainModel);
 
-            await _regionRepository.CreateRegionAsync(regionDomainModel);
+                // Map domain model back to dto
 
-            // Map domain model back to dto
+                var regionDto = _mapper.Map<RegionDTO>(regionDomainModel);
 
-            var regionDto = _mapper.Map<RegionDTO>(regionDomainModel);
-
-            return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
+                return CreatedAtAction(nameof(GetById), new { id = regionDomainModel.Id }, regionDto);
+            }
+            else
+            { 
+                return BadRequest(ModelState);
+            }
         }
+
 
 
         // PUT : to update existing region
@@ -89,7 +96,7 @@ namespace NZWalks.API.Controllers
             {
                 return NotFound();
             }
-    
+
             return Ok(_mapper.Map<RegionDTO>(regionDomainModel));
         }
 
