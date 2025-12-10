@@ -8,6 +8,7 @@ using NZWalks.API.Data;
 using NZWalks.API.Models.Domain;
 using NZWalks.API.Models.DTO;
 using NZWalks.API.Repositories;
+using System.Text.Json;
 
 
 namespace NZWalks.API.Controllers
@@ -20,25 +21,39 @@ namespace NZWalks.API.Controllers
         private readonly NZWalksDbContext _context;
         private readonly IRegionRepository _regionRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<RegionController> _logger;
 
-        public RegionController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper)
+        public RegionController(NZWalksDbContext dbContext, IRegionRepository regionRepository, IMapper mapper, ILogger<RegionController> logger)
         {
             this._context = dbContext;
             this._regionRepository = regionRepository;
             this._mapper = mapper;
+            this._logger = logger;
         }
 
         // GET all Regions
         // GET: https://localhost:portnumber/api/regions
         [HttpGet]
-        [Authorize(Roles = "Reader")]
+        //[Authorize(Roles = "Reader")]
         public async Task<IActionResult> GetAll()
         {
-            // Get data from database - Domain models
-            var regionsDomain = await _regionRepository.GetAllAsync();
+            try
+            {
+                //throw new Exception("Testing Exception");
 
-            // map Domain model to DTO and return DTO
-            return Ok(_mapper.Map<List<RegionDTO>>(regionsDomain));
+                // Get data from database - Domain models
+                var regionsDomain = await _regionRepository.GetAllAsync();
+
+                _logger.LogInformation($"Data from GetAll Action: {JsonSerializer.Serialize(regionsDomain)}");
+
+                // map Domain model to DTO and return DTO
+                return Ok(_mapper.Map<List<RegionDTO>>(regionsDomain));
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+                throw;
+            }           
         }
 
         // GET Region by Id
